@@ -3,6 +3,7 @@ import { access, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promise
 import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
+import { fileURLToPath } from 'node:url';
 
 import { ANYDOCS_CONFIG_FILE, ANYDOCS_WORKFLOW_FILE } from '../src/config/project-config.ts';
 import { ValidationError } from '../src/errors/validation-error.ts';
@@ -11,6 +12,9 @@ import { initializeProject } from '../src/services/init-service.ts';
 async function createTempRepoRoot(): Promise<string> {
   return mkdtemp(path.join(os.tmpdir(), 'anydocs-init-'));
 }
+
+const REPO_ROOT = fileURLToPath(new URL('../../..', import.meta.url));
+const REPO_SKILL_GUIDE = path.join(REPO_ROOT, 'docs', 'skill.md');
 
 test('initializeProject creates the canonical project structure and starter content', async () => {
   const repoRoot = await createTempRepoRoot();
@@ -31,6 +35,7 @@ test('initializeProject creates the canonical project structure and starter cont
     await access(path.join(projectRoot, ANYDOCS_WORKFLOW_FILE));
     await access(path.join(projectRoot, 'navigation', 'en.json'));
     await access(path.join(projectRoot, 'pages', 'en', 'welcome.json'));
+    await access(path.join(projectRoot, 'skill.md'));
     await access(path.join(projectRoot, 'imports'));
     await access(path.join(repoRoot, 'dist'));
     await access(path.join(repoRoot, 'dist', 'mcp'));
@@ -51,10 +56,13 @@ test('initializeProject creates the canonical project structure and starter cont
         };
       };
     };
+    const skillGuide = await readFile(path.join(projectRoot, 'skill.md'), 'utf8');
+    const sourceSkillGuide = await readFile(REPO_SKILL_GUIDE, 'utf8');
 
     assert.equal(page.status, 'published');
     assert.equal(page.slug, 'welcome');
     assert.equal(page.title, 'Welcome');
+    assert.equal(skillGuide, sourceSkillGuide);
     assert.equal(config.site?.theme?.id, 'classic-docs');
     assert.equal(config.site?.theme?.codeTheme, 'github-dark');
     assert.equal(config.site?.theme?.branding, undefined);
@@ -66,6 +74,7 @@ test('initializeProject creates the canonical project structure and starter cont
     assert.ok(
       result.createdFiles.some((filePath) => filePath.endsWith(path.join('pages', 'en', 'welcome.json'))),
     );
+    assert.ok(result.createdFiles.some((filePath) => filePath.endsWith('skill.md')));
   } finally {
     await rm(repoRoot, { recursive: true, force: true });
   }

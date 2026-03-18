@@ -159,10 +159,12 @@ test('init prints next-step commands after creating a project', async () => {
     assert.equal(result.exitCode, 0);
     assert.equal(result.signal, null);
     assert.match(spawned.getStdout(), /Initialized Anydocs project/);
+    assert.match(spawned.getStdout(), /skill\.md/);
     assert.match(spawned.getStdout(), /Next:/);
     assert.match(spawned.getStdout(), /pnpm --filter @anydocs\/cli cli build/);
     assert.match(spawned.getStdout(), /pnpm --filter @anydocs\/cli cli preview/);
     assert.equal(spawned.getStderr(), '');
+    await access(path.join(repoRoot, 'skill.md'));
   } finally {
     await rm(repoRoot, { recursive: true, force: true });
   }

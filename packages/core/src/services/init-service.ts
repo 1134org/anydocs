@@ -1,5 +1,6 @@
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import {
   ANYDOCS_CONFIG_FILE,
@@ -31,6 +32,10 @@ export type InitProjectResult = {
   createdFiles: string[];
 };
 
+const PROJECT_SKILL_GUIDE_FILE = 'skill.md';
+const INIT_SERVICE_DIR = path.dirname(fileURLToPath(import.meta.url));
+const REPO_SKILL_GUIDE_PATH = path.resolve(INIT_SERVICE_DIR, '../../../../docs/skill.md');
+
 async function ensurePathDoesNotExist(targetPath: string, entity: string, remediation: string) {
   try {
     await fs.access(targetPath);
@@ -50,6 +55,19 @@ async function ensurePathDoesNotExist(targetPath: string, entity: string, remedi
 async function writeJson(filePath: string, value: unknown): Promise<void> {
   await fs.mkdir(path.dirname(filePath), { recursive: true });
   await fs.writeFile(filePath, JSON.stringify(value, null, 2) + '\n', 'utf8');
+}
+
+async function copyProjectSkillGuide(projectRoot: string): Promise<string | null> {
+  const targetPath = path.join(projectRoot, PROJECT_SKILL_GUIDE_FILE);
+
+  try {
+    await fs.access(targetPath);
+    return null;
+  } catch {
+    await fs.mkdir(path.dirname(targetPath), { recursive: true });
+    await fs.copyFile(REPO_SKILL_GUIDE_PATH, targetPath);
+    return targetPath;
+  }
 }
 
 function createStarterPage(language: DocsLanguage): PageDoc<Record<string, never>> {
@@ -119,6 +137,10 @@ export async function initializeProject(options: InitProjectOptions): Promise<In
   );
 
   const createdFiles = [paths.configFile, paths.workflowFile];
+  const skillGuideFile = await copyProjectSkillGuide(paths.projectRoot);
+  if (skillGuideFile) {
+    createdFiles.push(skillGuideFile);
+  }
   const repository = createDocsRepository(paths.projectRoot);
   const starterNavigation = createStarterNavigation();
 

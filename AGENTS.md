@@ -1,268 +1,279 @@
 # AGENTS.md
 
-This file provides guidance to Codex (Codex.ai/code) when working with code in this repository.
+This file provides guidance to Codex when working in this repository.
 
 ## Project Overview
 
-**Anydocs** is an AI-era documentation site editor with a local-first approach. It's designed to evolve from a single-project editor into a **multi-project documentation workspace**.
+**Anydocs** is a local-first documentation editor made of three main surfaces:
 
-### Current Capabilities
+1. **Studio**: the authoring UI for editing project configuration, navigation, and page content.
+2. **Docs Reader**: the published-content reading site.
+3. **CLI**: the project init/build/preview/import toolchain.
 
-The system consists of three main components:
+The codebase still carries some future-facing multi-project concepts, but the current implementation is centered on opening one docs project root at a time.
 
-1. **Docs Site**: the reading site built from edited documentation structure and theme.
-   - Route shape: `/[lang]/docs/[...slug]`
-   - Navigation, TOC, breadcrumbs, prev/next links
-   - Internal search via build-time static indexes
-   - Only displays `status=published` pages
-   - Current code disables Docs Site routes outside production
+## Current Capabilities
 
-2. **Studio**: the project's editing feature for visual document editing and structure orchestration.
-   - Route: `/studio`
-   - Three-column layout: navigation orchestration + Yoopta editor + metadata panel
-   - Reads/writes project files through `/api/local/*`
-   - Supports all page statuses (draft/in_review/published)
-   - Includes recent-project and local-folder opening flows
-   - Disabled in production
+### Studio
 
-3. **CLI**: the command-line tool centered on building Docs Site artifacts.
-   - Primary command: `build`
-   - Supporting commands: `init`, `preview`, `import`, `convert-import`
-   - Produces search indexes, `llms.txt`, and WebMCP static artifacts
+- Primary routes: `/` and `/studio`
+- Intended runtime: local development and desktop runtime
+- UI shape: navigation + editor + metadata/settings workflow
+- Data access: `/api/local/*` in web dev, or Electron IPC in desktop runtime
+- Supports all authoring states: `draft`, `in_review`, `published`
 
-### Future Direction (vNext)
+### Docs Reader
 
-Upgrading to a **multi-project workspace**:
-- Support opening and editing multiple documentation projects in parallel
-- Each project maintains independent content, navigation, search index, llms.txt, and WebMCP outputs
-- Project-level isolation for routing, building, and publishing
+- Canonical routes: `/{lang}` and `/{lang}/{slug}`
+- Compatibility redirects still exist at `/docs/*` and `/{lang}/docs/*`
+- Only published content is exposed to the reader
+- Search uses static indexes generated during build
+- Reader routes are available in production and CLI preview/export runtime
+- Reader routes are not available in plain `pnpm dev`
+
+### CLI
+
+- Primary commands: `init`, `build`, `preview`, `import`, `convert-import`
+- Recommended invocation in this monorepo: `pnpm --filter @anydocs/cli cli <command>`
+- Direct entrypoint also works: `node --experimental-strip-types packages/cli/src/index.ts <command>`
+- `preview` already runs live; `--watch` is a compatibility flag
 
 ## Common Commands
 
 ### Development
+
 ```bash
-pnpm install          # Install dependencies
-pnpm dev              # Start development server (Next.js)
-pnpm dev:desktop      # Start Electron desktop app
+pnpm install
+pnpm dev
+pnpm dev:desktop
 ```
 
-### Build & Validation
+### Build, Lint, and Tests
+
 ```bash
-pnpm build            # Full workspace build
-pnpm build:web        # Build Next.js app (includes gen:public)
-pnpm build:cli        # Build CLI package
-pnpm build:desktop    # Build Electron app
-pnpm typecheck        # TypeScript type checking
-pnpm lint             # ESLint
-pnpm check            # Full validation: gen:public + typecheck + lint
+pnpm build
+pnpm build:web
+pnpm build:cli
+pnpm build:desktop
+pnpm typecheck
+pnpm lint
+pnpm test
+pnpm test:web
+pnpm test:full
 ```
 
 ### CLI Commands
+
 ```bash
-# Direct node execution (recommended in monorepo)
-node --experimental-strip-types packages/cli/src/index.ts <command> [options]
-
-# Project lifecycle
-node --experimental-strip-types packages/cli/src/index.ts init <targetDir>
-node --experimental-strip-types packages/cli/src/index.ts build <targetDir> [--output <dir>] [--watch]
-node --experimental-strip-types packages/cli/src/index.ts preview <targetDir> [--watch]
-
-# Build options
---output, -o <dir>   # Custom output directory (default: {targetDir}/dist)
---watch              # Watch for changes and rebuild
-
-# Legacy import
-node --experimental-strip-types packages/cli/src/index.ts import <sourceDir> <targetDir> [lang]
-node --experimental-strip-types packages/cli/src/index.ts convert-import <importId> <targetDir>
-
-# Examples
-node --experimental-strip-types packages/cli/src/index.ts build .
-node --experimental-strip-types packages/cli/src/index.ts build . --output /var/www/docs
-node --experimental-strip-types packages/cli/src/index.ts build . --watch
+pnpm --filter @anydocs/cli cli init [targetDir]
+pnpm --filter @anydocs/cli cli build [targetDir] [--output <dir>] [--watch]
+pnpm --filter @anydocs/cli cli preview [targetDir] [--watch]
+pnpm --filter @anydocs/cli cli import <sourceDir> [targetDir] [lang]
+pnpm --filter @anydocs/cli cli convert-import <importId> [targetDir]
+pnpm --filter @anydocs/cli cli help [command]
+pnpm --filter @anydocs/cli cli version
 ```
 
 ## Architecture
 
 ### Separation of Concerns
 
-**IMPORTANT**: Anydocs follows a strict separation between tool code and documentation projects:
-
-- **Anydocs Tool** (`/packages/`): The editor, CLI, and build system
-- **Docs Projects**: Independent project directories, or workspace-style projects under `content/projects/{projectId}/`
-- **Build Artifacts** (`/dist/` or custom): Deployable static sites
+- **Tooling repo**: this repository contains the editor, CLI, desktop shell, and shared build/runtime logic
+- **Docs project**: a separate project root containing `anydocs.config.json`, `pages/`, `navigation/`, and related source files
+- Newly initialized projects may also include `skill.md` as an AI-facing helper document
+- **Artifacts**: build output written to the configured output directory, defaulting to `<projectRoot>/dist`
 
 ### Project Structure
 
 ```text
-anydocs/                                     # Tool repository
+anydocs/
 ├── packages/
-│   ├── cli/                                 # CLI tool
-│   ├── core/                                # Core library
-│   ├── web/                                 # Next.js Studio + Docs Site
-│   └── desktop/                             # Electron app
+│   ├── cli/
+│   ├── core/
+│   ├── desktop/
+│   └── web/
 ├── examples/
-│   └── demo-docs/                           # Example independent docs project
+│   └── demo-docs/
 │       ├── anydocs.config.json
 │       ├── anydocs.workflow.json
 │       ├── pages/
 │       ├── navigation/
 │       ├── imports/
 │       └── dist/
-│           ├── build-manifest.json
-│           └── projects/default/
-│               ├── llms.txt
-│               ├── mcp/
-│               └── site/assets/
-└── docs/                                    # Project documentation
+│           ├── index.html
+│           ├── llms.txt
+│           ├── search-index.en.json
+│           ├── search-index.zh.json
+│           ├── mcp/
+│           ├── en/
+│           ├── zh/
+│           └── docs/
+└── docs/
 ```
-
-**Compatibility Notes:**
-- Legacy flat paths (`public/llms.txt`, `public/search-index.*.json`, `public/mcp/*`) are generated for the default project
-- Current implementation still has single-project constraints in public routing and HTTP surfaces
 
 ### Routes
 
-| Route | Description | Environment |
-|-------|-------------|-------------|
-| `/` | Editor homepage → Studio | Development only |
-| `/studio` | Studio editing interface | Development only |
-| `/[lang]/docs/[...slug]` | Docs Site reading route (published only) | Production / preview context |
-| `/api/local/*` | Local write APIs | Development only |
+| Route | Description | Runtime |
+|-------|-------------|---------|
+| `/` | Studio home; redirects to default docs language in CLI docs runtime | Dev / desktop / CLI docs runtime |
+| `/studio` | Studio authoring interface | Dev / desktop |
+| `/docs/[...slug]` | Redirects to the default language reader route | Reader runtime |
+| `/[lang]` | Canonical language landing route for the reader | Reader runtime |
+| `/[lang]/[...slug]` | Canonical published docs reader route | Reader runtime |
+| `/[lang]/docs/[...slug]` | Compatibility redirect to `/{lang}/...` | Reader runtime |
+| `/api/local/*` | Local filesystem-backed Studio APIs | Local web dev only in intended deployments |
 
 ### Content Model
 
-**Page JSON Structure:**
+**Page JSON**
+
 ```json
 {
-  "id": "getting-started-intro",
-  "lang": "zh",
-  "slug": "getting-started/introduction",
-  "title": "Introduction",
-  "description": "...",
-  "tags": ["GUIDE", "CORE"],
+  "id": "welcome",
+  "lang": "en",
+  "slug": "welcome",
+  "title": "Welcome",
+  "description": "Starter page created by anydocs init.",
   "status": "draft" | "in_review" | "published",
-  "updatedAt": "2026-03-08T00:00:00.000Z",
-  "content": {
-    "yoopta": "...blocks..."
+  "tags": ["GUIDE"],
+  "updatedAt": "2026-03-18T00:00:00.000Z",
+  "content": {},
+  "render": {
+    "markdown": "# Welcome",
+    "plainText": "Welcome"
   }
 }
 ```
 
-**Navigation Tree Structure:**
+**Navigation JSON**
+
 ```json
 {
   "version": 1,
   "items": [
     {
       "type": "section",
-      "title": "GETTING STARTED",
+      "title": "Getting Started",
       "children": [
-        { "type": "page", "pageId": "getting-started-intro" },
-        { "type": "folder", "title": "Advanced", "children": [...] }
+        { "type": "page", "pageId": "welcome" }
       ]
     }
   ]
 }
 ```
 
-Supported node types: `section`, `folder`, `page`, `link`
+Supported navigation node types: `section`, `folder`, `page`, `link`
 
 ### Key Libraries
 
-- **Editor**: Yoopta (Slate-based block editor, Notion-like)
-- **UI**: shadcn/ui (Radix UI + Tailwind CSS v4)
-- **Search**: MiniSearch (build-time static index, client-side retrieval)
-- **Framework**: Next.js 15 App Router
+- **Editor**: Yoopta
+- **UI**: Radix + shadcn/ui + Tailwind CSS v4
+- **Search**: MiniSearch static indexes
+- **Framework**: Next.js 16 App Router
+- **Desktop shell**: Electron
 
 ### Data Flow
 
-1. **Editing Flow** (Development):
-   - Studio reads/writes via `/api/local/*` (Node.js filesystem)
-   - Content written to a project's `pages/` and `navigation/`
-   - All page statuses visible in Studio
+1. **Authoring**
+   - Studio reads and writes canonical source files from the selected project root.
+   - Web dev uses `/api/local/*`; desktop runtime uses IPC.
+   - All page statuses remain visible in Studio.
 
-2. **Build Flow**:
-   - CLI `build` is the primary artifact-generation path
-   - Input: project `pages/` + `navigation/`
-   - Output: `{projectRoot}/dist/projects/<projectId>/` (search indexes, `llms.txt`, WebMCP artifacts)
-   - Only `status=published` pages included in build artifacts
+2. **Build**
+   - CLI `build` validates source files and emits static artifacts.
+   - Output defaults to `<projectRoot>/dist`, or `--output <dir>` when provided.
+   - The artifact structure is flat, with `llms.txt`, `search-index.<lang>.json`, `mcp/`, and language route directories written directly under the output root.
+   - Only `published` pages are promoted into reader/search/LLM artifacts.
 
-3. **Reading Flow**:
-   - Docs Site reads from the selected project context
-   - Filters to `status=published` only
-   - Search UI consumes generated static search indexes
+3. **Preview / Reader**
+   - CLI `preview` starts a local reader runtime for the chosen project root.
+   - Reader pages resolve the project from CLI runtime env or preview cookies.
+   - The reader never serves `draft` or `in_review` pages.
 
-### Key Files & Directories
+## Key Files and Directories
 
-- **Docs Index**: `docs/README.md` (entrypoint for current documentation structure)
-- **Architecture**: `docs/planning-artifacts/architecture.md` (planning and architectural decisions)
-- **PRD**: `docs/planning-artifacts/prd.md` (product requirements)
-- **Epics**: `docs/planning-artifacts/epics.md` (delivery breakdown)
-- **Usage Manual**: `docs/04-usage-manual.md` (detailed operational guide)
-- **Dev Guide**: `docs/05-dev-guide.md` (developer workflow guide)
-- **Data Layer**:
-  - `packages/web/lib/docs/fs.ts` - Studio-side local read/write bridge
-  - `packages/web/lib/docs/data.ts` - Published-only Docs Site data layer
-- **Studio**: `packages/web/components/studio/` - Editor components
-- **Reading Site**: `packages/web/app/[lang]/docs/[[...slug]]/page.tsx`
-- **Build Script**: `packages/web/scripts/gen-public-assets.mjs` - Generate default-project public assets for the web app
+- `README.md`: repository overview
+- `docs/README.md`: docs index
+- `docs/planning-artifacts/architecture.md`: architecture decisions and planning context
+- `docs/planning-artifacts/prd.md`: product requirements
+- `docs/planning-artifacts/epics.md`: delivery breakdown
+- `packages/web/lib/docs/fs.ts`: Studio-side filesystem bridge
+- `packages/web/lib/docs/data.ts`: published reader data/runtime selection
+- `packages/web/app/[lang]/[...slug]/page.tsx`: canonical reader page
+- `packages/web/app/[lang]/docs/[[...slug]]/page.tsx`: compatibility redirect route
+- `packages/web/app/docs/[[...slug]]/page.tsx`: default-language redirect route
+- `packages/web/components/studio/`: Studio UI
+- `packages/core/src/publishing/build-artifacts.ts`: static artifact writer
 
-## Production Constraints (Critical)
+## Runtime and Security Constraints
 
-**Security & Privacy:**
-- `/` and `/studio` MUST return 404 in production
-- `/api/local/*` MUST be disabled in production
-- `llms.txt` and WebMCP artifacts MUST only expose `published` content
-- Never expose `draft` or `in_review` pages to public
+- In hosted web production, `/` and `/studio` should not expose the Studio unless explicitly running in desktop runtime.
+- `/api/local/*` is a local-authoring surface and should not be exposed as a public deployment API.
+- `llms.txt`, search indexes, and `mcp/` artifacts must remain `published`-only.
+- Never expose `draft` or `in_review` pages through public reader or machine-readable outputs.
 
-**Git Management:**
-- This project does NOT provide commit/review/publish APIs
-- Users must use external Git tools for version control
+## Editing Constraints
 
-## Content Constraints
+### Studio Block Set
 
-### Minimal Block Set
-Studio should restrict available Yoopta plugins to documentation essentials:
-- `heading`, `paragraph`, `list`, `code`, `image`, `callout`, `table`, `divider`
-- Avoid complex layout blocks to reduce export/index/render complexity
+The current Studio editor setup includes these document-oriented Yoopta blocks:
 
-### Validation Requirements
-- `slug` must be unique within each language
-- `pageId` is consistent across languages (for i18n associations)
-- Navigation references must point to valid `pageId` values
-- Duplicate slug detection during save
+- `paragraph`
+- `heading` (H1/H2/H3)
+- `blockquote`
+- `list` (bulleted, numbered, todo)
+- `code` and `code-group`
+- `image`
+- `table`
+- `callout`
+- `divider`
+- `link`
+
+Inline marks currently enabled:
+
+- `bold`
+- `italic`
+- `underline`
+- `strike`
+- `code`
+
+Avoid expanding the editor toward layout-heavy page-builder behavior unless the task explicitly requires it.
+
+### Validation Expectations
+
+- `slug` must be unique within a language
+- page references in navigation must resolve to existing `pageId`s
+- enabled languages must have both `pages/<lang>/` and `navigation/<lang>.json`
+- only `published` content may enter build artifacts
 
 ## Workflow Examples
 
-### Workflow A: Open External Project In Studio
+### Open the Demo Project in Studio
+
 ```bash
 pnpm install
-pnpm dev                                          # Start Studio
-# Open an external project root in Studio at http://localhost:3000/studio
-pnpm --filter @anydocs/cli cli build /absolute/path/to/project
+pnpm dev
 ```
 
-### Workflow B: Create New Project
+Then open `http://localhost:3000/studio` and select `examples/demo-docs` as the project path.
+
+### Create a New Project
+
 ```bash
 pnpm --filter @anydocs/cli cli init ./workspace/my-docs
+pnpm --filter @anydocs/cli cli preview ./workspace/my-docs
 pnpm --filter @anydocs/cli cli build ./workspace/my-docs
-pnpm --filter @anydocs/cli preview ./workspace/my-docs
 ```
 
-### Workflow C: Import Legacy Docs
+### Import Legacy Markdown
+
 ```bash
-pnpm --filter @anydocs/cli cli import ./legacy-docs . zh
-# Review import at ./imports/<importId>/ when running against a project root
-pnpm --filter @anydocs/cli cli convert-import <importId> .
-# Generated draft pages will be in ./pages/zh/
-# Review and publish in Studio
+pnpm --filter @anydocs/cli cli import ./legacy-docs ./workspace/my-docs zh
+pnpm --filter @anydocs/cli cli convert-import <importId> ./workspace/my-docs
 ```
 
-## Current Gaps (vs Multi-Project Target)
+## Known Gaps
 
-- **Studio routing**: project selection exists, but context still rides on `/studio?p=...` and local storage rather than a canonical `/studio/{projectId}` route
-- **Docs Site routing**: reading routes are not explicitly project-scoped; preview currently bridges context with cookies
-- **Machine-readable HTTP surface**: there is no `/api/mcp/*` implementation yet; WebMCP is currently artifact-first
-- **Validation**: minimal block set and duplicate slug checks still need stricter enforcement
-
-For the current documentation map, see: `docs/README.md`
+- Project-scoped web routes are not implemented; reader/project selection still depends on runtime env or preview cookie context.
+- Multi-project workspace support is not yet a first-class routing/build abstraction.
+- `/api/local/*` exists as a local surface, but production exposure relies on deployment discipline rather than a dedicated route-level rejection layer.

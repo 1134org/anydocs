@@ -1,0 +1,15 @@
+{
+  "id": "waas-batch-create-address",
+  "lang": "zh",
+  "slug": "waas-batch-create-address",
+  "title": "批量创建地址",
+  "description": "批量创建收款地址",
+  "tags": [],
+  "status": "published",
+  "updatedAt": "2026-03-19T00:00:00.000Z",
+  "content": {},
+  "render": {
+    "markdown": "# 批量创建地址\n\n`POST /api/v1/address/batch_create`\n\n单次最多创建 100 个地址。\n\n| 参数 | 类型 | 必须 | 说明 |\n|------|------|------|------|\n| pid | int64 | 是 | WaaS 项目 ID |\n| chain_id | string | 是 | 区块链 ID |\n| count | int32 | 是 | 创建数量（最大 100） |\n| callback_url | string | 否 | 充值回调地址 |\n\n## 返回：地址列表数组",
+    "plainText": "批量创建地址 POST /api/v1/address/batch_create 单次最多创建 100 个地址。  参数  类型  必须  说明   pid  int64  是  WaaS 项目 ID   chain_id  string  是  区块链 ID   count  int32  是  创建数量（最大 100）   callback_url  string  否  充值回调地址   返回：地址列表数组"
+  }
+}

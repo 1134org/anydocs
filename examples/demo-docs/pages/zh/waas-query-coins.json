@@ -1,0 +1,15 @@
+{
+  "id": "waas-query-coins",
+  "lang": "zh",
+  "slug": "waas-query-coins",
+  "title": "查询项目支持币种",
+  "description": "查询项目支持的币种列表",
+  "tags": [],
+  "status": "published",
+  "updatedAt": "2026-03-19T00:00:00.000Z",
+  "content": {},
+  "render": {
+    "markdown": "# 查询项目支持币种\n\n`POST /api/v1/project/coins`\n\n| 参数 | 类型 | 必须 | 说明 |\n|------|------|------|------|\n| pid | int64 | 是 | WaaS 项目 ID |\n\n## 返回：payout_coins 和 address_coins 数组",
+    "plainText": "查询项目支持币种 POST /api/v1/project/coins  参数  类型  必须  说明   pid  int64  是  WaaS 项目 ID   返回：payout_coins 和 address_coins 数组"
+  }
+}

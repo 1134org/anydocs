@@ -1,0 +1,15 @@
+{
+  "id": "waas-create-address",
+  "lang": "zh",
+  "slug": "waas-create-address",
+  "title": "创建地址",
+  "description": "为 WaaS 项目创建收款地址",
+  "tags": [],
+  "status": "published",
+  "updatedAt": "2026-03-19T00:00:00.000Z",
+  "content": {},
+  "render": {
+    "markdown": "# 创建地址\n\n`POST /api/v1/address/create`\n\n## 请求参数\n\n| 参数 | 类型 | 必须 | 说明 |\n|------|------|------|------|\n| pid | int64 | 是 | WaaS 项目 ID |\n| chain_id | string | 是 | 区块链 ID |\n| alias | string | 否 | 地址别名 |\n| callback_url | string | 否 | 充值回调地址 |\n\n## 返回：chain_id + address",
+    "plainText": "创建地址 POST /api/v1/address/create  请求参数  参数  类型  必须  说明   pid  int64  是  WaaS 项目 ID   chain_id  string  是  区块链 ID   alias  string  否  地址别名   callback_url  string  否  充值回调地址   返回：chain_id + address"
+  }
+}

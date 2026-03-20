@@ -1,0 +1,15 @@
+{
+  "id": "pe-refund",
+  "lang": "zh",
+  "slug": "pe-refund",
+  "title": "退款",
+  "description": "订单退款流程",
+  "tags": [],
+  "status": "published",
+  "updatedAt": "2026-03-19T00:00:00.000Z",
+  "content": {},
+  "render": {
+    "markdown": "# 退款\n\n## 退款类型\n\n- 部分退款 — 退还部分金额\n- 全额退款 — 退还全部金额\n\n## 退款状态：0（处理中）、1（成功）、2（失败）\n\n## 退款回调字段\n\nrefund_id, refund_address, refund_currency, refund_amount, refund_fee, actual_refund_amount, refund_status, refund_tx_id\n\n> 实际退款金额 = 退款金额 - Gas Fee",
+    "plainText": "退款  退款类型  部分退款 — 退还部分金额  全额退款 — 退还全部金额  退款状态：0（处理中）、1（成功）、2（失败）  退款回调字段 refund_id, refund_address, refund_currency, refund_amount, refund_fee, actual_refund_amount, refund_status, refund_tx_id  实际退款金额 = 退款金额  Gas Fee"
+  }
+}

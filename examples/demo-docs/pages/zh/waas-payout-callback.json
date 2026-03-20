@@ -1,0 +1,15 @@
+{
+  "id": "waas-payout-callback",
+  "lang": "zh",
+  "slug": "waas-payout-callback",
+  "title": "提币通知",
+  "description": "提币交易的回调通知",
+  "tags": [],
+  "status": "published",
+  "updatedAt": "2026-03-19T00:00:00.000Z",
+  "content": {},
+  "render": {
+    "markdown": "# 提币通知\n\n提币交易被处理时，WaaS 向 callback_url 发起回调通知。\n\n## 提币状态码\n\n| 状态码 | 说明 |\n|--------|------|\n| 0 | 待审批 |\n| 1 | 签名通过 |\n| 2 | 签名驳回 |\n| 3 | 审批取消 |\n| 4 | 审批驳回 |\n| 5 | 待签名 |\n| 6 | 交易成功 |\n| 7 | 交易失败 |\n\n## 回调响应：返回字符串 success",
+    "plainText": "提币通知 提币交易被处理时，WaaS 向 callback_url 发起回调通知。  提币状态码  状态码  说明   0  待审批   1  签名通过   2  签名驳回   3  审批取消   4  审批驳回   5  待签名   6  交易成功   7  交易失败   回调响应：返回字符串 success"
+  }
+}

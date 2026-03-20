@@ -1,0 +1,15 @@
+{
+  "id": "waas-address-legal",
+  "lang": "zh",
+  "slug": "waas-address-legal",
+  "title": "校验地址合法性",
+  "description": "检查地址格式是否合法",
+  "tags": [],
+  "status": "published",
+  "updatedAt": "2026-03-19T00:00:00.000Z",
+  "content": {},
+  "render": {
+    "markdown": "# 校验地址合法性\n\n`POST /api/v1/address/legal`\n\n检查目标地址是否为指定区块链的合法地址。建议在提币前先校验。\n\n| 参数 | 类型 | 必须 | 说明 |\n|------|------|------|------|\n| pid | int64 | 是 | WaaS 项目 ID |\n| address | string | 是 | 要校验的地址 |\n| chain_id | string | 是 | 区块链 ID |\n\n## 返回：result (true/false)",
+    "plainText": "校验地址合法性 POST /api/v1/address/legal 检查目标地址是否为指定区块链的合法地址。建议在提币前先校验。  参数  类型  必须  说明   pid  int64  是  WaaS 项目 ID   address  string  是  要校验的地址   chain_id  string  是  区块链 ID   返回：result true/false"
+  }
+}

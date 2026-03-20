@@ -260,7 +260,7 @@ export function AtlasDocsReaderLayout({
         </div>
       </header>
 
-      <div className="mx-auto lg:grid lg:min-h-[calc(100dvh-60px)] lg:max-w-[1600px] lg:grid-cols-[280px_minmax(0,1fr)]">
+      <div className="mx-auto lg:!grid lg:!min-h-[calc(100dvh-60px)] lg:!max-w-[1600px] lg:!grid-cols-[280px_minmax(0,1fr)]">
         <aside className="hidden border-r border-fd-border bg-[color:var(--atlas-sidebar-surface)] lg:col-start-1 lg:!block">
           <div className="sticky top-[60px] h-[calc(100dvh-60px)] overflow-hidden">{desktopSidebar}</div>
         </aside>

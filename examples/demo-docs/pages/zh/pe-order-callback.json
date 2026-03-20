@@ -1,0 +1,15 @@
+{
+  "id": "pe-order-callback",
+  "lang": "zh",
+  "slug": "pe-order-callback",
+  "title": "订单支付通知",
+  "description": "订单状态变化回调",
+  "tags": [],
+  "status": "published",
+  "updatedAt": "2026-03-19T00:00:00.000Z",
+  "content": {},
+  "render": {
+    "markdown": "# 订单支付通知\n\n订单状态变化时，支付引擎通过 callback_url 发起回调。\n\n## 回调事件类型 (event_type)\n\n| 类型 | 说明 |\n|------|------|\n| expired | 订单超时 |\n| paid | 支付完成 |\n| partial_paid | 部分支付 |\n| overpaid | 超额支付 |\n| refunded | 退款 |\n| paid_remain | 补款 |\n\n## 订单状态：new / paid / expired / paid_over / paid_partial\n\n## 回调响应：返回字符串 success",
+    "plainText": "订单支付通知 订单状态变化时，支付引擎通过 callback_url 发起回调。  回调事件类型 event_type  类型  说明   expired  订单超时   paid  支付完成   partial_paid  部分支付   overpaid  超额支付   refunded  退款   paid_remain  补款   订单状态：new / paid / expired / paid_over / paid_partial  回调响应：返回字符串 success"
+  }
+}

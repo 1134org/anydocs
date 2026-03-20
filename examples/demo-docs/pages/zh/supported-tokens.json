@@ -1,0 +1,15 @@
+{
+  "id": "supported-tokens",
+  "lang": "zh",
+  "slug": "supported-tokens",
+  "title": "支持的网络和代币",
+  "description": "Cregis 支持的区块链和代币",
+  "tags": [],
+  "status": "published",
+  "updatedAt": "2026-03-19T00:00:00.000Z",
+  "content": {},
+  "render": {
+    "markdown": "# 支持的网络和代币\n\n## 主要网络\n\n| 网络 | 原生代币 | chain_id | 主要代币 |\n|------|----------|----------|----------|\n| Ethereum | ETH | 60 | USDT, USDC, DAI, LINK 等 |\n| TRON | TRX | 195 | USDT, USDC |\n| Solana | SOL | 1000 | USDT, USDC, USD1 |\n| BNB Smart Chain | BNB | 2510 | USDT, USDC, USD1 等 |\n| Polygon | POL | 62 | USDT, USDC, DAI |\n| Base | ETH | 66 | USDC, USDT, EURC |\n| Arbitrum One | ARB | 63 | USDT, USDC |\n| Avalanche-C | AVAX | 65 | USDT, USDC |\n| TON | TON | 2000 | USDT |\n| Aptos | APT | 3100 | — |\n| SUI | SUI | 3000 | CETUS, WAL 等 |\n| Optimism | OP | 64 | USDT, USDC |\n| Ripple | XRP | 144 | — |\n\n其他：DOGE, LTC, FIL, ADA, ETC, opBNB, Linea, X Layer, Sei, Cronos\n\n## 币种标识格式\n\ncurrency = chain_id@token_id，例如 TRX = 195@195",
+    "plainText": "支持的网络和代币  主要网络  网络  原生代币  chain_id  主要代币   Ethereum  ETH  60  USDT, USDC, DAI, LINK 等   TRON  TRX  195  USDT, USDC   Solana  SOL  1000  USDT, USDC, USD1   BNB Smart Chain  BNB  2510  USDT, USDC, USD1 等   Polygon  POL  62  USDT, USDC, DAI   Base  ETH  66  USDC, USDT, EURC   Arbitrum One  ARB  63  USDT, USDC   AvalancheC  AVAX  65  USDT, USDC   TON  TON  2000  USDT   Aptos  APT  3100  —   SUI  SUI  3000  CETUS, WAL 等   Optimism  OP  64  USDT, USDC   Ripple  XRP  144  —  其他：DOGE, LTC, FIL, ADA, ETC, opBNB, Linea, X Layer, Sei, Cronos  币种标识格式 currency = chain_id@token_id，例如 TRX = 195@195"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "id": "pe-settlement",
+  "lang": "zh",
+  "slug": "pe-settlement",
+  "title": "结算说明",
+  "description": "支付引擎结算流程",
+  "tags": [],
+  "status": "published",
+  "updatedAt": "2026-03-19T00:00:00.000Z",
+  "content": {},
+  "render": {
+    "markdown": "# 结算说明\n\nCregis 支付引擎提供 T+0 高效结算。\n\n## 结算状态\n\n| 状态 | 说明 |\n|------|------|\n| unsettled | 尚未结算 |\n| settling | 正在结算 |\n| settled | 结算完成 |\n\n## 结算类型：system（自动）/ manual（手动）\n\n请在 Cregis 客户端的项目设置中配置结算币种和钱包地址。",
+    "plainText": "结算说明 Cregis 支付引擎提供 T+0 高效结算。  结算状态  状态  说明   unsettled  尚未结算   settling  正在结算   settled  结算完成   结算类型：system（自动）/ manual（手动） 请在 Cregis 客户端的项目设置中配置结算币种和钱包地址。"
+  }
+}

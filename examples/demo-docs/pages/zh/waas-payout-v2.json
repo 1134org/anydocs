@@ -1,0 +1,15 @@
+{
+  "id": "waas-payout-v2",
+  "lang": "zh",
+  "slug": "waas-payout-v2",
+  "title": "发起钱包提币 v2",
+  "description": "v2 版本支持指定发送方地址",
+  "tags": [],
+  "status": "published",
+  "updatedAt": "2026-03-19T00:00:00.000Z",
+  "content": {},
+  "render": {
+    "markdown": "# 发起钱包提币 v2\n\n`POST /api/v2/payout`\n\n相比 v1 新增：wallet_id（指定出款钱包）、from_address（发送方地址）、to_address（替代 address）。\n\n其余参数与 v1 相同。返回 cid。",
+    "plainText": "发起钱包提币 v2 POST /api/v2/payout 相比 v1 新增：wallet_id（指定出款钱包）、from_address（发送方地址）、to_address（替代 address）。 其余参数与 v1 相同。返回 cid。"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "id": "authentication",
+  "lang": "zh",
+  "slug": "authentication",
+  "title": "认证与签名",
+  "description": "API 签名规则和请求响应格式",
+  "tags": [],
+  "status": "published",
+  "updatedAt": "2026-03-19T00:00:00.000Z",
+  "content": {},
+  "render": {
+    "markdown": "# 认证与签名\n\n## 签名算法\n\n1. 除去 sign 和空值参数外，其他参数按字典序排序\n2. 按 key1value1key2value2… 格式拼接\n3. 将项目 API Key 拼接到字符串最前面\n4. 对结果取 MD5 并转为小写，即为 sign\n\n## 请求格式\n\n参数分为系统参数（pid, nonce, timestamp, sign）和业务参数。\n\n## 响应格式\n\n```json\n{\n  \"code\": \"00000\",\n  \"msg\": \"ok\",\n  \"data\": { }\n}\n```\n\ncode 为 00000 表示成功，其他为失败。",
+    "plainText": "认证与签名  签名算法 1. 除去 sign 和空值参数外，其他参数按字典序排序 2. 按 key1value1key2value2… 格式拼接 3. 将项目 API Key 拼接到字符串最前面 4. 对结果取 MD5 并转为小写，即为 sign  请求格式 参数分为系统参数（pid, nonce, timestamp, sign）和业务参数。  响应格式 json {   \"code\": \"00000\",   \"msg\": \"ok\",   \"data\": { } } code 为 00000 表示成功，其他为失败。"
+  }
+}

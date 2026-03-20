@@ -1,0 +1,15 @@
+{
+  "id": "waas-setup",
+  "lang": "zh",
+  "slug": "waas-setup",
+  "title": "WaaS 项目准备",
+  "description": "WaaS 项目开发前准备",
+  "tags": [],
+  "status": "published",
+  "updatedAt": "2026-03-19T00:00:00.000Z",
+  "content": {},
+  "render": {
+    "markdown": "# WaaS 项目准备\n\n## 开始之前\n\n如果使用 SDK，请参阅对应语言的 SDK 指南（Java、Go、PHP、C#）。\n\n## 设置步骤\n\n1. **设置账户** — 创建团队，设置开发者角色\n2. **创建项目** — Cregis 客户端 > WaaS 项目 > 创建（需先创建钱包）\n3. **配置 IP 白名单** — 设置 > IP 白名单\n4. **获取 API 信息** — 设置 > 开发者，查看项目 ID 和 API Key",
+    "plainText": "WaaS 项目准备  开始之前 如果使用 SDK，请参阅对应语言的 SDK 指南（Java、Go、PHP、C）。  设置步骤 1. 设置账户 — 创建团队，设置开发者角色 2. 创建项目 — Cregis 客户端  WaaS 项目  创建（需先创建钱包） 3. 配置 IP 白名单 — 设置  IP 白名单 4. 获取 API 信息 — 设置  开发者，查看项目 ID 和 API Key"
+  }
+}

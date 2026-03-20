@@ -1,0 +1,15 @@
+{
+  "id": "pe-query-order",
+  "lang": "zh",
+  "slug": "pe-query-order",
+  "title": "查询订单信息",
+  "description": "查询订单详情",
+  "tags": [],
+  "status": "published",
+  "updatedAt": "2026-03-19T00:00:00.000Z",
+  "content": {},
+  "render": {
+    "markdown": "# 查询订单信息\n\n`POST /api/v2/order/info`\n\n| 参数 | 类型 | 必须 | 说明 |\n|------|------|------|------|\n| pid | int64 | 是 | 支付引擎项目 ID |\n| cregis_id | string | 是 | Cregis 系统流水号 |\n\n## 返回\n\n订单基本信息、付款记录(payment_detail)、支付信息(payment_info)、商品详情(order_details)、退款记录(refund_data)、结算状态、子商户信息",
+    "plainText": "查询订单信息 POST /api/v2/order/info  参数  类型  必须  说明   pid  int64  是  支付引擎项目 ID   cregis_id  string  是  Cregis 系统流水号   返回 订单基本信息、付款记录payment_detail、支付信息payment_info、商品详情order_details、退款记录refund_data、结算状态、子商户信息"
+  }
+}

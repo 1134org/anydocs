@@ -1,0 +1,15 @@
+{
+  "id": "waas-query-sub-address",
+  "lang": "zh",
+  "slug": "waas-query-sub-address",
+  "title": "查询子地址提币信息",
+  "description": "查询子地址提币状态",
+  "tags": [],
+  "status": "published",
+  "updatedAt": "2026-03-19T00:00:00.000Z",
+  "content": {},
+  "render": {
+    "markdown": "# 查询子地址提币信息\n\n`POST /api/v1/sub_address_withdrawal/info`\n\n| 参数 | 类型 | 必须 | 说明 |\n|------|------|------|------|\n| pid | int64 | 是 | WaaS 项目 ID |\n| cid | int64 | 是 | Cregis 系统流水号 |\n\n## 返回：与钱包提币查询类似的信息结构",
+    "plainText": "查询子地址提币信息 POST /api/v1/sub_address_withdrawal/info  参数  类型  必须  说明   pid  int64  是  WaaS 项目 ID   cid  int64  是  Cregis 系统流水号   返回：与钱包提币查询类似的信息结构"
+  }
+}

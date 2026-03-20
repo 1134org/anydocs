@@ -1,0 +1,15 @@
+{
+  "id": "payment-engine-setup",
+  "lang": "zh",
+  "slug": "payment-engine-setup",
+  "title": "支付引擎准备",
+  "description": "支付引擎开发前准备",
+  "tags": [],
+  "status": "published",
+  "updatedAt": "2026-03-19T00:00:00.000Z",
+  "content": {},
+  "render": {
+    "markdown": "# 支付引擎准备\n\n## 设置步骤\n\n1. **设置账户** — 创建团队，设置开发者角色\n2. **创建项目** — Cregis 客户端 > 支付引擎 > 创建（需先创建钱包）\n3. **配置 IP 白名单** — 项目设置 > IP 白名单\n4. **获取 API 信息** — 项目设置 > 开发者",
+    "plainText": "支付引擎准备  设置步骤 1. 设置账户 — 创建团队，设置开发者角色 2. 创建项目 — Cregis 客户端  支付引擎  创建（需先创建钱包） 3. 配置 IP 白名单 — 项目设置  IP 白名单 4. 获取 API 信息 — 项目设置  开发者"
+  }
+}

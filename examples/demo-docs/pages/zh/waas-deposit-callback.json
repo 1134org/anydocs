@@ -1,0 +1,15 @@
+{
+  "id": "waas-deposit-callback",
+  "lang": "zh",
+  "slug": "waas-deposit-callback",
+  "title": "充值通知",
+  "description": "充值到账后的回调通知",
+  "tags": [],
+  "status": "published",
+  "updatedAt": "2026-03-19T00:00:00.000Z",
+  "content": {},
+  "render": {
+    "markdown": "# 充值通知\n\n代币存入项目地址并链上确认后，WaaS 向创建地址时指定的 callback_url 发送通知。\n\n> 安全提示：收到回调后，建议先调用\"校验地址是否存在\"接口验证。\n\n## 回调参数\n\npid, cid, chain_id, token_id, currency, address, amount, status(1=成功), txid, block_height, block_time, memo\n\n## 回调响应：返回字符串 success 为成功",
+    "plainText": "充值通知 代币存入项目地址并链上确认后，WaaS 向创建地址时指定的 callback_url 发送通知。  安全提示：收到回调后，建议先调用\"校验地址是否存在\"接口验证。  回调参数 pid, cid, chain_id, token_id, currency, address, amount, status1=成功, txid, block_height, block_time, memo  回调响应：返回字符串 success 为成功"
+  }
+}

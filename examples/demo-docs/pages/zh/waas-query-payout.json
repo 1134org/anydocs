@@ -1,0 +1,15 @@
+{
+  "id": "waas-query-payout",
+  "lang": "zh",
+  "slug": "waas-query-payout",
+  "title": "查询钱包提币信息",
+  "description": "查询提币交易状态",
+  "tags": [],
+  "status": "published",
+  "updatedAt": "2026-03-19T00:00:00.000Z",
+  "content": {},
+  "render": {
+    "markdown": "# 查询钱包提币信息\n\n`POST /api/v1/payout/query`\n\n| 参数 | 类型 | 必须 | 说明 |\n|------|------|------|------|\n| pid | int64 | 是 | WaaS 项目 ID |\n| cid | int64 | 是 | Cregis 系统流水号 |\n\n## 返回：完整提币信息（地址、金额、状态、txid 等）",
+    "plainText": "查询钱包提币信息 POST /api/v1/payout/query  参数  类型  必须  说明   pid  int64  是  WaaS 项目 ID   cid  int64  是  Cregis 系统流水号   返回：完整提币信息（地址、金额、状态、txid 等）"
+  }
+}

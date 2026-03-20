@@ -1,0 +1,15 @@
+{
+  "id": "waas-sub-address-withdrawal",
+  "lang": "zh",
+  "slug": "waas-sub-address-withdrawal",
+  "title": "子地址提币",
+  "description": "从子地址发起提币",
+  "tags": [],
+  "status": "published",
+  "updatedAt": "2026-03-19T00:00:00.000Z",
+  "content": {},
+  "render": {
+    "markdown": "# 子地址提币\n\n`POST /api/v1/sub_address_withdrawal`\n\n从项目的子地址发起提币请求。\n\n| 参数 | 类型 | 必须 | 说明 |\n|------|------|------|------|\n| pid | int64 | 是 | WaaS 项目 ID |\n| currency | string | 是 | 代币标识 |\n| from_address | string | 是 | 子地址（发送方） |\n| to_address | string | 是 | 接收方地址 |\n| amount | string | 是 | 金额 |\n| third_party_id | string | 是 | 调用方业务编号 |\n\n## 返回：cid",
+    "plainText": "子地址提币 POST /api/v1/sub_address_withdrawal 从项目的子地址发起提币请求。  参数  类型  必须  说明   pid  int64  是  WaaS 项目 ID   currency  string  是  代币标识   from_address  string  是  子地址（发送方）   to_address  string  是  接收方地址   amount  string  是  金额   third_party_id  string  是  调用方业务编号   返回：cid"
+  }
+}

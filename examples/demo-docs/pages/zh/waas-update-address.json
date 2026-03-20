@@ -1,0 +1,15 @@
+{
+  "id": "waas-update-address",
+  "lang": "zh",
+  "slug": "waas-update-address",
+  "title": "更新地址",
+  "description": "更新地址配置信息",
+  "tags": [],
+  "status": "published",
+  "updatedAt": "2026-03-19T00:00:00.000Z",
+  "content": {},
+  "render": {
+    "markdown": "# 更新地址\n\n`POST /api/v1/address/update`\n\n更新地址的别名、回调地址或状态，至少更新一项。\n\n| 参数 | 类型 | 必须 | 说明 |\n|------|------|------|------|\n| pid | int64 | 是 | WaaS 项目 ID |\n| address | string | 是 | 要更新的地址 |\n| alias | string | 否 | 别名 |\n| callback_url | string | 否 | 回调地址 |\n| status | string | 否 | 0-启用 1-禁用 |",
+    "plainText": "更新地址 POST /api/v1/address/update 更新地址的别名、回调地址或状态，至少更新一项。  参数  类型  必须  说明   pid  int64  是  WaaS 项目 ID   address  string  是  要更新的地址   alias  string  否  别名   callback_url  string  否  回调地址   status  string  否  0启用 1禁用"
+  }
+}

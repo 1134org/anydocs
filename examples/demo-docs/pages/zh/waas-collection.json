@@ -1,0 +1,15 @@
+{
+  "id": "waas-collection",
+  "lang": "zh",
+  "slug": "waas-collection",
+  "title": "发起归集",
+  "description": "将分散资金归集到指定地址",
+  "tags": [],
+  "status": "published",
+  "updatedAt": "2026-03-19T00:00:00.000Z",
+  "content": {},
+  "render": {
+    "markdown": "# 发起归集\n\n`POST /api/v1/collection`\n\n| 参数 | 类型 | 必须 | 说明 |\n|------|------|------|------|\n| pid | int64 | 是 | WaaS 项目 ID |\n| currency | string | 是 | 代币标识 |\n| from_address | string | 是 | 项目地址（禁用状态不允许） |\n| to_address | string | 是 | 接收地址（须为团队钱包地址） |\n| amount | string | 否 | 归集金额，不传则全部 |\n\n## 返回：cid",
+    "plainText": "发起归集 POST /api/v1/collection  参数  类型  必须  说明   pid  int64  是  WaaS 项目 ID   currency  string  是  代币标识   from_address  string  是  项目地址（禁用状态不允许）   to_address  string  是  接收地址（须为团队钱包地址）   amount  string  否  归集金额，不传则全部   返回：cid"
+  }
+}

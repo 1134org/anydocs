@@ -1,0 +1,15 @@
+{
+  "id": "dev-tools",
+  "lang": "zh",
+  "slug": "dev-tools",
+  "title": "调试工具与测试代币",
+  "description": "开发测试工具和测试代币获取",
+  "tags": [],
+  "status": "published",
+  "updatedAt": "2026-03-19T00:00:00.000Z",
+  "content": {},
+  "render": {
+    "markdown": "# 调试工具与测试代币\n\n测试代币只能在开发环境使用。\n\n| 网络 | 领取地址 |\n|------|----------|\n| Ripple (XRP) | https://test.bithomp.com/en/faucet |\n| BNB Smart Chain | https://www.bnbchain.org/en/testnet-faucet |\n| TRON (TRX) | 通过 Discord 社区领取 |\n| Solana (SOL) | https://faucet.solana.com |",
+    "plainText": "调试工具与测试代币 测试代币只能在开发环境使用。  网络  领取地址   Ripple XRP  https://test.bithomp.com/en/faucet   BNB Smart Chain  https://www.bnbchain.org/en/testnetfaucet   TRON TRX  通过 Discord 社区领取   Solana SOL  https://faucet.solana.com"
+  }
+}

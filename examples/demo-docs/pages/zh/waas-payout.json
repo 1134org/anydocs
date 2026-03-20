@@ -1,0 +1,15 @@
+{
+  "id": "waas-payout",
+  "lang": "zh",
+  "slug": "waas-payout",
+  "title": "发起钱包提币",
+  "description": "从钱包地址发起提币",
+  "tags": [],
+  "status": "published",
+  "updatedAt": "2026-03-19T00:00:00.000Z",
+  "content": {},
+  "render": {
+    "markdown": "# 发起钱包提币\n\n`POST /api/v1/payout`\n\n| 参数 | 类型 | 必须 | 说明 |\n|------|------|------|------|\n| pid | int64 | 是 | WaaS 项目 ID |\n| currency | string | 是 | 代币标识（chain_id@token_id） |\n| address | string | 是 | 接收方地址 |\n| amount | string | 是 | 出款金额 |\n| callback_url | string | 否 | 回调地址 |\n| third_party_id | string | 是 | 调用方业务编号 |\n| remark | string | 否 | 备注（≤256字符） |\n| memo | string | 否 | 上链信息（仅 TON、XRP） |\n\n## 返回：cid（系统流水号）",
+    "plainText": "发起钱包提币 POST /api/v1/payout  参数  类型  必须  说明   pid  int64  是  WaaS 项目 ID   currency  string  是  代币标识（chain_id@token_id）   address  string  是  接收方地址   amount  string  是  出款金额   callback_url  string  否  回调地址   third_party_id  string  是  调用方业务编号   remark  string  否  备注（≤256字符）   memo  string  否  上链信息（仅 TON、XRP）   返回：cid（系统流水号）"
+  }
+}

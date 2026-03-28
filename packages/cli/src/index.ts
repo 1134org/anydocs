@@ -19,6 +19,7 @@ import {
   parsePageGetCommandArgs,
   parsePageListCommandArgs,
   parseProjectReadCommandArgs,
+  parseStudioCommandArgs,
   parseWorkflowCommandArgs,
 } from './commands/command-args.ts';
 import { runConvertImportCommand } from './commands/convert-import-command.ts';
@@ -37,6 +38,7 @@ import {
 import { runPreviewCommand } from './commands/preview-command.ts';
 import { runNavigationGetCommand } from './commands/nav-command.ts';
 import { runWorkflowInspectCommand } from './commands/workflow-command.ts';
+import { runStudioCommand } from './commands/studio-command.ts';
 
 const args = process.argv.slice(2);
 const command = args[0];
@@ -112,6 +114,13 @@ async function main() {
         json,
       );
     }
+    case 'studio': {
+      return runCommand(
+        () => runStudioCommand({ ...parseStudioCommandArgs(commandArgs), json }),
+        'studio',
+        json,
+      );
+    }
     case 'init': {
       return runCommand(
         () => runInitCommand({ ...parseCreateProjectCommandArgs(commandArgs), json }),
@@ -150,7 +159,7 @@ async function main() {
         writeJsonError(command, new Error(`Unknown command "${command}".`));
       } else {
         error(`Unknown command "${command}".`);
-        error('Run "pnpm --filter @anydocs/cli cli help" for usage.');
+        error('Run "anydocs help" for usage.');
       }
       return EXIT_CODE_FAILURE;
   }

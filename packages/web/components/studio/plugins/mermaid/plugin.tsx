@@ -1,13 +1,21 @@
-import { YooptaPlugin, generateId, useBlockData, useYooptaEditor } from '@yoopta/editor';
+import { useEffect, useRef, useState } from 'react';
+import {
+  generateId,
+  type PluginElementRenderProps,
+  type SlateElement,
+  YooptaPlugin,
+  useYooptaEditor,
+} from '@yoopta/editor';
+
 import { MermaidViewer } from './mermaid-viewer';
-import { useState, useRef, useEffect } from 'react';
 
 // A local edit component for the Mermaid Block
-const MermaidElement = (props: any) => {
+const MermaidElement = (props: PluginElementRenderProps) => {
   const { attributes, children, element, blockId } = props;
   const editor = useYooptaEditor();
   const [isEditing, setIsEditing] = useState(false);
-  const code = element.props?.code || '';
+  const mermaidElement = element as SlateElement & { props?: { code?: string } };
+  const code = mermaidElement.props?.code || '';
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Focus textarea when editing starts
@@ -113,14 +121,14 @@ export const MermaidPlugin = new YooptaPlugin({
           }
         },
       },
-      serialize: (element, text, blockMeta) => {
+      serialize: (element, _text, _blockMeta) => {
         const code = element.props?.code || '';
         // In SSR or naive HTML output, we inject a div that can be hydrated or rendered.
         return `<div data-yoopta-mermaid="true" data-code="${encodeURIComponent(code)}" class="mermaid-diagram">${code}</div>`;
       },
     },
     markdown: {
-      serialize: (element, text, blockMeta) => {
+      serialize: (element, _text, _blockMeta) => {
         const code = element.props?.code || '';
         return `\`\`\`mermaid\n${code}\n\`\`\``;
       },

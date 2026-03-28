@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 
 import { info } from './output/logger.ts';
 
-export const CLI_INVOCATION = 'pnpm --filter @anydocs/cli cli';
+export const CLI_INVOCATION = 'anydocs';
 
 const packageJson = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8')) as {
   version: string;
@@ -28,6 +28,7 @@ export function printGeneralHelp(): void {
     '  init [targetDir]                       Initialize a new docs project',
     '  build [targetDir] [options]            Build a deployable static docs site',
     '  preview [targetDir] [options]          Start a live local docs preview server',
+    '  studio [targetDir] [options]           Start Studio for a single project',
     '  project <subcommand> [options]         Create or inspect project contract state',
     '  workflow inspect [targetDir]           Inspect the workflow standard definition',
     '  page <subcommand> [options]            Inspect pages by language, id, or slug',
@@ -46,6 +47,7 @@ export function printGeneralHelp(): void {
     `  ${formatCliCommand(['build', './workspace/my-docs'])}`,
     `  ${formatCliCommand(['build', './workspace/my-docs', '--output', './dist-public'])}`,
     `  ${formatCliCommand(['preview', './workspace/my-docs'])}`,
+    `  ${formatCliCommand(['studio', './workspace/my-docs', '--no-open'])}`,
     `  ${formatCliCommand(['project', 'inspect', './workspace/my-docs', '--json'])}`,
     `  ${formatCliCommand(['page', 'get', 'welcome', './workspace/my-docs', '--lang', 'en'])}`,
     `  ${formatCliCommand(['import', './legacy-docs', './workspace/my-docs', 'zh'])}`,
@@ -90,6 +92,18 @@ export function printCommandHelp(command: string): boolean {
         '',
         'Options:',
         '  --watch              Compatibility flag; preview already runs live',
+        '  --json               Print structured JSON output',
+      ]);
+      return true;
+    case 'studio':
+      printLines([
+        'Usage:',
+        `  ${formatCliCommand(['studio', '[targetDir]', '[options]'])}`,
+        '',
+        'Options:',
+        '  --host <host>        Host interface to bind (default: 127.0.0.1)',
+        '  --port <port>        Port to bind (default: auto)',
+        '  --no-open            Do not attempt to open a browser automatically',
         '  --json               Print structured JSON output',
       ]);
       return true;

@@ -26,7 +26,7 @@ test('composePageFromTemplate builds structured how-to content and render output
       {
         title: 'Create the page',
         body: 'Use page_create_from_template for richer initial structure.',
-        code: 'pnpm --filter @anydocs/mcp dev',
+        code: 'npx -y @anydocs/mcp',
         language: 'bash',
       },
     ],

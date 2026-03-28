@@ -11,6 +11,8 @@ interface WelcomeScreenProps {
   recentProjects: StudioProject[];
   isOpeningFolder: boolean;
   supportsNativeDirectoryPicker: boolean;
+  allowExternalProjectOpen: boolean;
+  allowRecentProjects: boolean;
   onOpenProject: (projectPath?: string) => Promise<void> | void;
   onSelectProject: (project: StudioProject) => void;
   onRemoveProject: (project: StudioProject) => void;
@@ -20,6 +22,8 @@ export function WelcomeScreen({
   recentProjects,
   isOpeningFolder,
   supportsNativeDirectoryPicker,
+  allowExternalProjectOpen,
+  allowRecentProjects,
   onOpenProject,
   onSelectProject,
   onRemoveProject,
@@ -36,44 +40,52 @@ export function WelcomeScreen({
           </p>
         </div>
 
-        <div className="space-y-4">
-          <Button
-            onClick={() => {
-              if (supportsNativeDirectoryPicker) {
-                void onOpenProject();
-                return;
-              }
+        {allowExternalProjectOpen ? (
+          <div className="space-y-4">
+            <Button
+              onClick={() => {
+                if (supportsNativeDirectoryPicker) {
+                  void onOpenProject();
+                  return;
+                }
 
-              setIsProjectPathDialogOpen(true);
+                setIsProjectPathDialogOpen(true);
+              }}
+              disabled={isOpeningFolder}
+              className="w-full h-12 text-lg gap-2"
+              size="lg"
+              data-testid="studio-open-project-button"
+            >
+              {isOpeningFolder ? (
+                <>
+                  <Loader2 className="size-5 animate-spin" />
+                  Opening...
+                </>
+              ) : (
+                <>
+                  <FolderOpen className="size-5" />
+                  Open External Project
+                </>
+              )}
+            </Button>
+          </div>
+        ) : (
+          <div className="rounded-lg border border-fd-border bg-fd-card px-4 py-3 text-sm text-fd-muted-foreground">
+            当前 Studio 入口已锁定到单个项目，不支持切换或打开其他目录。
+          </div>
+        )}
+
+        {allowExternalProjectOpen ? (
+          <ProjectPathDialog
+            open={isProjectPathDialogOpen}
+            onOpenChange={setIsProjectPathDialogOpen}
+            onSubmit={async (projectPath) => {
+              await onOpenProject(projectPath);
             }}
-            disabled={isOpeningFolder}
-            className="w-full h-12 text-lg gap-2"
-            size="lg"
-            data-testid="studio-open-project-button"
-          >
-            {isOpeningFolder ? (
-              <>
-                <Loader2 className="size-5 animate-spin" />
-                Opening...
-              </>
-            ) : (
-              <>
-                <FolderOpen className="size-5" />
-                Open External Project
-              </>
-            )}
-          </Button>
-        </div>
+          />
+        ) : null}
 
-        <ProjectPathDialog
-          open={isProjectPathDialogOpen}
-          onOpenChange={setIsProjectPathDialogOpen}
-          onSubmit={async (projectPath) => {
-            await onOpenProject(projectPath);
-          }}
-        />
-
-        {recentProjects.length > 0 && (
+        {allowRecentProjects && recentProjects.length > 0 && (
           <div className="space-y-3 pt-8">
             <h2 className="text-sm font-semibold text-fd-muted-foreground">Recent External Projects</h2>
             <div className="space-y-2">

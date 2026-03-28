@@ -1,5 +1,6 @@
 import { SUPPORTED_DOCS_LANGUAGES, ValidationError } from '@anydocs/core';
 import type { DocsLang } from '@/lib/docs/types';
+import { resolveStudioProjectQuery } from '@/lib/studio/server/project-policy';
 import { type NextRequest, NextResponse } from 'next/server';
 
 export const runtime = 'nodejs';
@@ -25,10 +26,7 @@ function makeValidationError(message: string, rule: string, metadata?: Record<st
 }
 
 export function readProjectQuery(request: NextRequest): LocalApiProjectQuery {
-  const projectId = request.nextUrl.searchParams.get('projectId')?.trim() ?? '';
-  const customPath = request.nextUrl.searchParams.get('path')?.trim() || undefined;
-
-  return { projectId, customPath };
+  return resolveStudioProjectQuery(request);
 }
 
 export function requireQueryParam(request: NextRequest, key: string): string {

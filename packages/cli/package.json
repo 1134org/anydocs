@@ -1,24 +1,77 @@
 {
   "name": "@anydocs/cli",
-  "version": "1.0.0",
-  "private": true,
+  "version": "1.0.5",
   "type": "module",
   "bin": {
-    "anydocs": "./src/index.ts"
+    "anydocs": "dist/index.js"
+  },
+  "files": [
+    "dist",
+    "studio-runtime",
+    "docs-runtime"
+  ],
+  "publishConfig": {
+    "access": "public"
   },
   "scripts": {
+    "clean": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true }); require('node:fs').rmSync('studio-runtime', { recursive: true, force: true }); require('node:fs').rmSync('docs-runtime', { recursive: true, force: true })\"",
     "cli": "node --experimental-strip-types src/index.ts",
     "dev": "tsx src/index.ts",
     "preview": "node --experimental-strip-types src/index.ts preview",
-    "build": "tsc",
+    "build": "pnpm clean && pnpm --filter @anydocs/core build && tsc -p tsconfig.json && node scripts/prepare-studio-runtime.mjs",
+    "prepublishOnly": "pnpm build",
     "test": "node --experimental-strip-types --test --test-concurrency=1 tests/**/*.test.ts",
-    "typecheck": "tsc --noEmit"
+    "test:package": "node --experimental-strip-types --test --test-concurrency=1 tests/package-artifact.test.ts",
+    "typecheck": "tsc --noEmit -p tsconfig.typecheck.json"
   },
   "dependencies": {
-    "@anydocs/core": "workspace:*"
+    "@anydocs/core": "workspace:*",
+    "@radix-ui/react-dialog": "^1.1.15",
+    "@radix-ui/react-popover": "^1.1.15",
+    "@radix-ui/react-scroll-area": "^1.2.9",
+    "@radix-ui/react-select": "^2.2.6",
+    "@radix-ui/react-separator": "^1.1.6",
+    "@radix-ui/react-slot": "^1.2.3",
+    "@radix-ui/react-tabs": "^1.1.13",
+    "@scalar/api-reference-react": "0.9.11",
+    "@tailwindcss/forms": "^0.5.11",
+    "@tailwindcss/postcss": "^4",
+    "@tailwindcss/typography": "^0.5.19",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@yoopta/blockquote": "^6.0.1",
+    "@yoopta/callout": "^6.0.1",
+    "@yoopta/code": "^6.0.1",
+    "@yoopta/divider": "^6.0.1",
+    "@yoopta/editor": "^6.0.1",
+    "@yoopta/headings": "^6.0.1",
+    "@yoopta/image": "^6.0.1",
+    "@yoopta/link": "^6.0.1",
+    "@yoopta/lists": "^6.0.1",
+    "@yoopta/marks": "^6.0.1",
+    "@yoopta/paragraph": "^6.0.1",
+    "@yoopta/table": "^6.0.1",
+    "@yoopta/themes-shadcn": "^6.0.1",
+    "@yoopta/ui": "^6.0.1",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "cmdk": "^1.1.1",
+    "lucide-react": "^0.542.0",
+    "minisearch": "^7.1.2",
+    "next": "16.1.6",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1",
+    "slate": "^0.123.0",
+    "slate-dom": "^0.123.0",
+    "slate-react": "^0.123.0",
+    "tailwind-merge": "^3.3.1",
+    "tailwindcss": "^4",
+    "typescript": "^5.0.0"
   },
   "devDependencies": {
-    "tsx": "^4.0.0",
-    "typescript": "^5.0.0"
+    "tsx": "^4.0.0"
   }
 }

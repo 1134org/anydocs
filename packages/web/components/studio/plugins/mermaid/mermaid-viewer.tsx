@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useState, useId } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import mermaid from 'mermaid';
 
 interface MermaidViewerProps {
@@ -45,10 +45,12 @@ export function MermaidViewer({ code }: MermaidViewerProps) {
           setSvgStr(result.svg);
           setError(null);
         }
-      } catch (err: any) {
+      } catch (error: unknown) {
         if (isMounted) {
-          setError(err.message || 'Failed to render Mermaid diagram');
-          console.error('[MermaidViewer] Render error:', err);
+          const message =
+            error instanceof Error ? error.message : 'Failed to render Mermaid diagram';
+          setError(message);
+          console.error('[MermaidViewer] Render error:', error);
         }
       }
     };

@@ -13,6 +13,13 @@ export type OptionalTargetDirCommandArgs = {
   targetDir?: string;
 };
 
+export type StudioCommandArgs = {
+  targetDir?: string;
+  host?: string;
+  port?: number;
+  open: boolean;
+};
+
 export type CreateProjectCommandArgs = {
   targetDir?: string;
   projectId?: string;
@@ -136,6 +143,51 @@ export function parseOptionalTargetDirCommandArgs(args: string[]): OptionalTarge
   }
 
   return { targetDir };
+}
+
+export function parseStudioCommandArgs(args: string[]): StudioCommandArgs {
+  let targetDir: string | undefined;
+  let host: string | undefined;
+  let port: number | undefined;
+  let open = true;
+
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i];
+
+    if (arg === '--host') {
+      host = readRequiredOptionValue(args, i, arg);
+      i++;
+      continue;
+    }
+
+    if (arg === '--port') {
+      const value = readRequiredOptionValue(args, i, arg);
+      const parsed = Number.parseInt(value, 10);
+      if (!Number.isInteger(parsed) || parsed <= 0) {
+        throw new Error(`Option "${arg}" requires a positive integer.`);
+      }
+      port = parsed;
+      i++;
+      continue;
+    }
+
+    if (arg === '--no-open') {
+      open = false;
+      continue;
+    }
+
+    if (arg.startsWith('-')) {
+      throw new Error(`Unknown option "${arg}".`);
+    }
+
+    if (targetDir !== undefined) {
+      throw new Error('Too many positional arguments provided.');
+    }
+
+    targetDir = arg;
+  }
+
+  return { targetDir, host, port, open };
 }
 
 export function parseCreateProjectCommandArgs(args: string[]): CreateProjectCommandArgs {

@@ -1,12 +1,14 @@
 import { spawn } from 'node:child_process';
 import { cp, mkdir, readFile, readdir, rename, rm, writeFile } from 'node:fs/promises';
+import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const webRoot = path.resolve(scriptDir, '..');
 const repoRoot = path.resolve(webRoot, '../..');
-const nextBin = path.join(webRoot, 'node_modules', 'next', 'dist', 'bin', 'next');
+const require = createRequire(import.meta.url);
+const nextBin = require.resolve('next/dist/bin/next');
 const tsconfigPath = path.join(webRoot, 'tsconfig.json');
 const RUNTIME_ENV_ALLOWLIST = new Set([
   'CI',
@@ -94,6 +96,28 @@ async function snapshotTsconfig() {
   return readFile(tsconfigPath, 'utf8');
 }
 
+function normalizeGeneratedTypeIncludes(include = [], distDir) {
+  const baseIncludes = include.filter(
+    (entry) => typeof entry === 'string' && !/^\.next($|[-/])/.test(entry),
+  );
+
+  return [
+    ...baseIncludes,
+    `${distDir}/types/**/*.ts`,
+    `${distDir}/dev/types/**/*.ts`,
+  ];
+}
+
+async function prepareTsconfigForDist(originalContent, distDir) {
+  const parsed = JSON.parse(originalContent);
+  const nextConfig = {
+    ...parsed,
+    include: normalizeGeneratedTypeIncludes(Array.isArray(parsed.include) ? parsed.include : [], distDir),
+  };
+
+  await writeFile(tsconfigPath, `${JSON.stringify(nextConfig, null, 2)}\n`, 'utf8');
+}
+
 async function restoreTsconfig(originalContent) {
   const currentContent = await readFile(tsconfigPath, 'utf8').catch(() => null);
   if (currentContent !== null && currentContent !== originalContent) {
@@ -127,6 +151,7 @@ async function pruneNonDocsSiteArtifacts(outputRoot, mode) {
 }
 
 async function pruneInternalExportArtifacts(outputRoot) {
+  const preservedTextFiles = new Set(['llms.txt', 'robots.txt']);
   const entries = await readdir(outputRoot, { withFileTypes: true });
 
   for (const entry of entries) {
@@ -142,7 +167,7 @@ async function pruneInternalExportArtifacts(outputRoot) {
       continue;
     }
 
-    if (entry.isFile() && entry.name.endsWith('.txt') && entry.name !== 'llms.txt') {
+    if (entry.isFile() && entry.name.endsWith('.txt') && !preservedTextFiles.has(entry.name)) {
       await rm(entryPath, { force: true });
     }
   }
@@ -188,6 +213,8 @@ async function exportDocsSite(mode) {
   }
 
   try {
+    await prepareTsconfigForDist(originalTsconfig, distDir);
+
     await runNext(['build', '--webpack'], {
       env: createRuntimeEnv(mode, {
         ANYDOCS_NEXT_DIST_DIR: distDir,
@@ -218,6 +245,7 @@ async function runPreviewProxy() {
   const args = process.argv.slice(3);
   const distDir = '.next-cli-preview';
   const originalTsconfig = await snapshotTsconfig();
+  await prepareTsconfigForDist(originalTsconfig, distDir);
   await rm(path.join(webRoot, distDir), { recursive: true, force: true });
   let shuttingDown = false;
   const child = spawn(process.execPath, [nextBin, 'dev', ...args], {

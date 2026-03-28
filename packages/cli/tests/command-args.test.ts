@@ -12,6 +12,7 @@ import {
   parsePageGetCommandArgs,
   parsePageListCommandArgs,
   parseProjectReadCommandArgs,
+  parseStudioCommandArgs,
   parseWorkflowCommandArgs,
 } from '../src/commands/command-args.ts';
 
@@ -59,6 +60,27 @@ test('parseOptionalTargetDirCommandArgs accepts zero or one positional argument'
   assert.deepEqual(parseOptionalTargetDirCommandArgs([]), { targetDir: undefined });
   assert.deepEqual(parseOptionalTargetDirCommandArgs(['fixtures/docs']), { targetDir: 'fixtures/docs' });
   assert.throws(() => parseOptionalTargetDirCommandArgs(['first', 'second']), /Too many positional arguments/);
+});
+
+test('parseStudioCommandArgs accepts target dir and runtime options', () => {
+  assert.deepEqual(parseStudioCommandArgs(['fixtures/docs', '--host', '0.0.0.0', '--port', '4040', '--no-open']), {
+    targetDir: 'fixtures/docs',
+    host: '0.0.0.0',
+    port: 4040,
+    open: false,
+  });
+
+  assert.deepEqual(parseStudioCommandArgs([]), {
+    targetDir: undefined,
+    host: undefined,
+    port: undefined,
+    open: true,
+  });
+});
+
+test('parseStudioCommandArgs rejects invalid port values and extra positionals', () => {
+  assert.throws(() => parseStudioCommandArgs(['--port', 'abc']), /positive integer/);
+  assert.throws(() => parseStudioCommandArgs(['one', 'two']), /Too many positional arguments/);
 });
 
 test('parseCreateProjectCommandArgs accepts positional and named init arguments', () => {

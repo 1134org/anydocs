@@ -230,5 +230,3 @@ my-docs-project/
 - [docs/classic-docs-theme-config.md](docs/classic-docs-theme-config.md)：`classic-docs` 阅读主题配置
 - [docs/README.md](docs/README.md)：`docs/` 目录索引
 - [artifacts/bmad/README.md](artifacts/bmad/README.md)：规划、技术规格和测试产物索引
-
-

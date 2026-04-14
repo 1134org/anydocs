@@ -22,10 +22,10 @@ jobs:
     steps:
       - name: Debug workflow_run
         run: |
-          echo "conclusion: ${{ github.event.workflow_run.conclusion }}"
-          echo "status: ${{ github.event.workflow_run.status }}"
-          echo "head_branch: ${{ github.event.workflow_run.head_branch }}"
-          echo "head_sha: ${{ github.event.workflow_run.head_sha }}"
+          echo "当前工作流运行所在分支 (GITHUB_REF): ${{ github.ref }}"
+          echo "触发本工作流的安全审计所在分支: ${{ github.event.workflow_run.head_branch }}"
+          echo "触发本工作流的安全审计提交 SHA: ${{ github.event.workflow_run.head_sha }}"
+          echo "当前工作流文件路径: ${{ github.workflow_ref }}" # 显示工作流定义来源
 
 
   quality:

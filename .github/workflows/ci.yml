@@ -17,6 +17,13 @@ env:
   CI: true
 
 jobs:
+  debug:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Debug workflow_run
+        run: |
+          echo "main分支111111111111"
+          
   quality:
 
     if: ${{ github.event.workflow_run.conclusion == 'success' }}     # 代码扫描通过，才会执行后续逻辑

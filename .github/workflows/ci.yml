@@ -5,7 +5,8 @@ on:
     workflows: ["Security Audit Workflow"]   # 此处必须与security-audit.yml中的name保持一致。此处可以保持不变即可。
     types:
       - completed
-
+    branches: # 添加分支过滤器，非常重要！
+      - dev
 permissions:
   contents: read
 

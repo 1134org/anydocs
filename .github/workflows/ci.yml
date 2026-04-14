@@ -30,7 +30,7 @@ jobs:
 
   quality:
 
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}     # 代码扫描通过，才会执行后续逻辑
+    # if: ${{ github.event.workflow_run.conclusion == 'success' }}     # 代码扫描通过，才会执行后续逻辑
     
     name: Quality
     runs-on: ubuntu-latest

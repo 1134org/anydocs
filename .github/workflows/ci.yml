@@ -17,6 +17,17 @@ env:
   CI: true
 
 jobs:
+  debug:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Debug workflow_run
+        run: |
+          echo "conclusion: ${{ github.event.workflow_run.conclusion }}"
+          echo "status: ${{ github.event.workflow_run.status }}"
+          echo "head_branch: ${{ github.event.workflow_run.head_branch }}"
+          echo "head_sha: ${{ github.event.workflow_run.head_sha }}"
+
+
   quality:
 
     if: ${{ github.event.workflow_run.conclusion == 'success' }}     # 代码扫描通过，才会执行后续逻辑

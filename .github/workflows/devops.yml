@@ -164,17 +164,10 @@ jobs:
               
             "failed")
               echo "❌ semgrep审计失败！"
-              ERROR_MSG=$(echo "$AUDIT_RESPONSE" | jq -r '.error // "未知错误"')
-              echo "失败原因: $ERROR_MSG"
-             
-             # 模拟成功
-              echo "audit-status=passed" >> $GITHUB_OUTPUT
-              echo "report-url=$REPORT_URL" >> $GITHUB_OUTPUT
-              echo "details=$DETAILS" >> $GITHUB_OUTPUT
-              break
-             # echo "audit-status=failed" >> $GITHUB_OUTPUT
-             # echo "error=$ERROR_MSG" >> $GITHUB_OUTPUT
-             # exit 1
+              echo "失败原因: $AUDIT_RESPONSE"
+              echo "audit-status=failed" >> $GITHUB_OUTPUT
+              echo "error=$AUDIT_RESPONSE" >> $GITHUB_OUTPUT
+              exit 1
               ;;
               
             "running")

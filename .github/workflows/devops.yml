@@ -167,7 +167,7 @@ jobs:
               echo "失败原因: $AUDIT_RESPONSE"
               echo "audit-status=failed" >> $GITHUB_OUTPUT
               echo "error=$AUDIT_RESPONSE" >> $GITHUB_OUTPUT
-              # exit 1   # 注释掉退出流水线，方便测试后续操作
+              # exit 1   # 注释掉退出流水线，方便测试后续操作,  模拟成功
               break
               ;;
               
@@ -228,7 +228,7 @@ jobs:
     name: Quality
     runs-on: ubuntu-latest
     needs: security-audit  # 依赖安全审计作业
-   #if: needs.security-audit.result != 'success'  # 只有审计成功才执行
+    if: needs.security-audit.result == 'success'  # 只有审计成功才执行
     timeout-minutes: 30
 
     steps:

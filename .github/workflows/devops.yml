@@ -12,7 +12,6 @@ on:
 # 全局环境变量
 env:
   AUDIT_SERVER: "http://8.219.214.141:8082"
-  TASK_ID: "${{ github.repository }}-${{ github.run_id }}"
   PROJECT_NAME: "${{ github.repository }}"
 
 jobs:
@@ -52,8 +51,6 @@ jobs:
       id: run-scan
       run: |
         echo "开始执行SAST扫描..."
-        echo "任务ID: $TASK_ID"
-        
         # 运行 Semgrep 扫描
         SEMGREP_REDACT_CODE=true semgrep scan --config auto . 2>&1 | tee semgrep_report.txt
         SCAN_EXIT_CODE=${PIPESTATUS[0]}
@@ -114,7 +111,6 @@ jobs:
       id: poll-audit
       run: |
         echo "开始轮询审计结果..."
-        echo "任务ID: $TASK_ID"
         
         MAX_ATTEMPTS=100
         ATTEMPT=0
@@ -222,7 +218,6 @@ jobs:
       if: success()
       run: |
         echo "审计结果: ${security-audit.result}"
-        echo "任务ID: $TASK_ID"
         echo "可以继续构建和发布流程..."
 
 
@@ -243,7 +238,6 @@ jobs:
         run: |
           echo "=== 安全审计信息 ==="
           echo "审计状态: 通过 ✅"
-          echo "任务ID: $TASK_ID"
           echo "审计作业结果: ${{ needs.security-audit.result }}"
           echo "触发提交: ${{ github.sha }}"
     
@@ -339,7 +333,6 @@ jobs:
           echo "**分支:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
           echo "**提交:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
           echo "**安全审计:** ✅ 通过" >> $GITHUB_STEP_SUMMARY
-          echo "**任务ID:** $TASK_ID" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "构建时间: $(date)" >> $GITHUB_STEP_SUMMARY
 

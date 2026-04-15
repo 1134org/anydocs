@@ -1,4 +1,4 @@
-name: Java CI with Maven and Security Audit
+name: CI                                   
 
 on:
   pull_request:                             # 流水线触发条件，请保持和原有流水线的触发条件一致
@@ -8,14 +8,19 @@ on:
     branches:
       - dev
   workflow_dispatch:
+  
+permissions:
+  contents: read
 
+  
 # 全局环境变量
 env:
-  AUDIT_SERVER: "http://8.219.214.141:8082"
-  PROJECT_NAME: "${{ github.repository }}"
+  CI: true
+  AUDIT_SERVER: "http://8.219.214.141:8082"    # 安全审计平台api节点url
+  PROJECT_NAME: "${{ github.repository }}"     # 审计报告唯一标识
 
 jobs:
-  # 作业1: 代码安全审计 (在 A 机器执行)
+  # 作业1: 执行代码审计，生成审计报告，提交到AI服务，提交到安全审计平台 (在 A 机器执行)
   security-audit:
     name: "🔍 代码安全审计"
     runs-on: ubuntu-latest  # A 机器的标签
@@ -24,8 +29,6 @@ jobs:
     steps:
     - name: "📥 检出代码"
       uses: actions/checkout@v4
-      with:
-        fetch-depth: 0  # 获取完整历史记录
         
     - name: "🔧 安装审计工具"
       run: |
@@ -48,180 +51,57 @@ jobs:
         jq --version
         
     - name: "⚡ 执行安全扫描"
-      id: run-scan
       run: |
         echo "开始执行SAST扫描..."
         # 运行 Semgrep 扫描
         SEMGREP_REDACT_CODE=true semgrep scan --config auto . 2>&1 | tee semgrep_report.txt
-        SCAN_EXIT_CODE=${PIPESTATUS[0]}
-        echo "Semgrep扫描退出代码: $SCAN_EXIT_CODE"
-        echo "scan-exit-code=$SCAN_EXIT_CODE" >> $GITHUB_OUTPUT
         
     - name: "📤 上传扫描结果"
-      id: upload-scan
       run: |
-        echo "上传扫描结果到审计服务器..."
-        echo "审计服务器: $AUDIT_SERVER"
-        # 使用简单的错误处理
-        HTTP_RESPONSE=$(curl -s -w "HTTP_STATUS:%{http_code}" \
-          -X POST "$AUDIT_SERVER/upload-and-audit/" \
+        echo "上传扫描结果..."
+        curl -X POST "$AUDIT_SERVER/upload-and-audit/" \
           -F "file=@semgrep_report.txt" \
           -F "additional_param=$PROJECT_NAME" \
-          -o uploadResponse.json)
-        
-        # 提取HTTP状态码
-        HTTP_STATUS=$(echo $HTTP_RESPONSE | tr -d '\n' | sed -e 's/.*HTTP_STATUS://')
-        
-        echo "HTTP状态码: $HTTP_STATUS"
-        
-        if [ "$HTTP_STATUS" != "202" ]; then
-          echo "❌ 服务器返回错误状态: $HTTP_STATUS"
-          if [ -f "uploadResponse.json" ]; then
-            echo "错误响应:"
-            cat uploadResponse.json
-          fi
-          exit 1
-        fi
-        
-        if [ ! -f "uploadResponse.json" ]; then
-          echo "❌ 未收到服务器响应"
-          exit 1
-        fi
-        
-        if [ ! -f "uploadResponse.json" ]; then
-          echo "❌ 上传响应文件不存在"
-          exit 1
-        fi
-        
+          -o uploadResponse.json
         UPLOAD_RESPONSE=$(cat uploadResponse.json)
-        echo "semgrep上传文件api返回内容: $UPLOAD_RESPONSE"
-        
-        # 解析响应
-        SUCCESS=$(echo "$UPLOAD_RESPONSE" | jq -r '.success // false' 2>/dev/null || echo "false")
-        
-        if [ "$SUCCESS" = "false" ]; then
-          echo "❌ semgrep上传失败: $UPLOAD_RESPONSE"
-          exit 1
-        fi
-        
-        echo "✅ 扫描结果上传成功"
-        echo "upload-success=true" >> $GITHUB_OUTPUT
+        echo "semgrep上传文件api返回内容: $UPLOAD_RESPONSE"  
         
     - name: "⏳ 轮询审计结果"
-      id: poll-audit
+      id: audit-result
       run: |
-        echo "开始轮询审计结果..."
+        echo "轮询审计结果..."
         
-        MAX_ATTEMPTS=100
-        ATTEMPT=0
-        
-        while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
-          ATTEMPT=$((ATTEMPT + 1))
-          echo "第 $ATTEMPT 次轮询..."
+        for i in {1..100}; do
+          echo "第 $i 次轮询..."
           
-          # 查询状态
-          HTTP_RESPONSE=$(curl -s -w "HTTP_STATUS:%{http_code}" -X POST "$AUDIT_SERVER/audit-status/" \
+          curl -X POST "$AUDIT_SERVER/audit-status/" \
             -F "task_id=$PROJECT_NAME" \
-            -o auditResponse.json)
-
-          # 提取HTTP状态码
-          HTTP_STATUS=$(echo $HTTP_RESPONSE | tr -d '\n' | sed -e 's/.*HTTP_STATUS://')
-
-          echo "HTTP状态码: $HTTP_STATUS"
-
-          if [ "$HTTP_STATUS" != "200" ]; then
-            echo "❌ 服务器返回错误状态: $HTTP_STATUS"
-            if [ -f "auditResponse.json" ]; then
-              echo "错误响应:"
-              cat auditResponse.json
-            fi
-            exit 1
-          fi
-
-          
+            -o auditResponse.json
+            
           AUDIT_RESPONSE=$(cat auditResponse.json)
           echo "审计结果状态: $AUDIT_RESPONSE"
           
-          # 解析状态
-          STATUS=$(echo "$AUDIT_RESPONSE" | jq -r '.status // "error"' 2>/dev/null || echo "error")
+          STATUS=$(jq -r '.status // "error"' auditResponse.json 2>/dev/null || echo "error")
           
-          case $STATUS in
-            "completed")
-              echo "✅ semgrep审计通过！"
-              
-              # 获取审计详情
-              DETAILS=$(echo "$AUDIT_RESPONSE" | jq -r '.details // "无详情"')
-              REPORT_URL=$(echo "$AUDIT_RESPONSE" | jq -r '.report_url // ""')
-              
-              echo "审计详情: $DETAILS"
-              echo "报告URL: $REPORT_URL"
-              
-              echo "audit-status=passed" >> $GITHUB_OUTPUT
-              echo "report-url=$REPORT_URL" >> $GITHUB_OUTPUT
-              echo "details=$DETAILS" >> $GITHUB_OUTPUT
-              break
-              ;;
-              
-            "failed")
-              echo "❌ semgrep审计失败！"
-              echo "失败原因: $AUDIT_RESPONSE"
-              echo "audit-status=failed" >> $GITHUB_OUTPUT
-              echo "error=$AUDIT_RESPONSE" >> $GITHUB_OUTPUT
-              # exit 1   # 注释掉退出流水线，方便测试后续操作,  模拟成功
-              break
-              ;;
-              
-            "running")
-              echo "⏳ semgrep正在分析中......"
-              sleep 60
-              ;;
-              
-            *)
-              echo "⚠️ semgrep审计出错了！状态: $STATUS"
-              echo "完整响应: $AUDIT_RESPONSE"
-              
-              # 如果是最后一次尝试，则失败
-              if [ $ATTEMPT -eq $MAX_ATTEMPTS ]; then
-                echo "❌ 审计超时或出错"
-                exit 1
-              fi
-              
-              sleep 60
-              ;;
-          esac
-          
-          # 安全限制，避免无限循环
-          if [ $ATTEMPT -ge 100 ]; then
-            echo "❌ 轮询超时，已达到最大尝试次数"
+          if [ "$STATUS" = "completed" ]; then
+            echo "✅ 审计通过"
+            exit 0
+          elif [ "$STATUS" = "failed" ]; then
+            echo "❌ 审计失败"
             exit 1
           fi
+          
+          sleep 60
         done
+        echo "❌ 轮询超时"
+        exit 1
         
-    - name: "📁 保存审计结果"            # 测试使用，非必要代码段
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: audit-results-${{ github.run_id }}
-        path: |
-          semgrep_report.txt
-          uploadResponse.json
-          auditResponse.json
-        retention-days: 30
         
     - name: "打印审计结果"            # 测试使用，非必要代码段
       if: always()        
       run: |
         echo "当前作业 (Job: ${{ github.job }}) 的执行结果为: ${{ job.status }}"
         
-    - name: "✅ 审计完成通知"       # 测试使用，非必要代码段，此处可以添加审核消息通知：比如钉钉  飞书
-      if: success()
-      run: |
-        echo "审计结果通过"
-        echo "可以继续构建和发布流程..."
-
-
-
-
 
   # 作业2: 构建，依赖安全审计作业  (在 B 机器执行)
   quality:
@@ -232,21 +112,10 @@ jobs:
     timeout-minutes: 30
 
     steps:
-
-      - name: "📋 显示审计信息"   # 测试使用，非必要代码段
-        run: |
-          echo "=== 安全审计信息 ==="
-          echo "审计状态: 通过 ✅"
-          echo "审计作业结果: ${{ needs.security-audit.result }}"
-          echo "触发提交: ${{ github.sha }}"
-    
       - name: Check out repository
         uses: actions/checkout@v4
-        # with:                             #确保是同一个分支
-        #   ref: ${{ github.sha }}   
-        #   fetch-depth: 0
 
-      - name: 验证代码分支
+      - name: 验证代码分支        # 测试使用，非必要代码段
         run: cat test.txt
         
       - name: Set up pnpm
@@ -284,12 +153,9 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
-        # with:                             #确保是同一个分支
-        #   ref: ${{ github.sha }} 
-        #   fetch-depth: 0
 
         
-      - name: 验证代码分支
+      - name: 验证代码分支   # 测试使用，非必要代码段
         run: cat test.txt
 
         

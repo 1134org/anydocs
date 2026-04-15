@@ -1,0 +1,196 @@
+name: CI                                   
+
+on:
+  pull_request:                             # 流水线触发条件，请保持和原有流水线的触发条件一致
+    branches:
+      - test
+  push:
+    branches:
+      - test
+  workflow_dispatch:
+  
+permissions:
+  contents: read
+
+  
+# 全局环境变量
+env:
+  CI: true
+  AUDIT_SERVER: "http://8.219.214.141:8082"    # 安全审计平台api节点url
+  PROJECT_NAME: "${{ github.repository }}"     # 审计报告唯一标识
+
+jobs:
+  # 作业1: 执行代码审计，生成审计报告，提交到AI服务，提交到安全审计平台 (在 A 机器执行)
+  security-audit:
+    name: "🔍 代码安全审计"
+    runs-on: ubuntu-latest  # A 机器的标签
+    timeout-minutes: 180  # 设置3小时超时
+    
+    steps:
+    - name: "📥 检出代码"
+      uses: actions/checkout@v4
+        
+    - name: "🔧 安装审计工具"
+      run: |
+        echo "安装必要的审计工具..."
+        # 检查并安装semgrep并登录
+        if ! command -v semgrep &> /dev/null; then
+          echo "安装semgrep..."
+          python3 -m pip install semgrep
+          SEMGREP_APP_TOKEN=6a1a502c8a9791793d66fdb2330b0b58e7f389921bfc953616df0a82c5a52409 semgrep login
+        fi
+        
+        # 检查并安装jq
+        if ! command -v jq &> /dev/null; then
+          echo "安装jq..."
+          sudo apt-get update && sudo apt-get install -y jq
+        fi
+        
+        # 验证工具安装
+        semgrep --version
+        jq --version
+        
+    - name: "⚡ 执行安全扫描"
+      run: |
+        echo "开始执行SAST扫描..."
+        # 运行 Semgrep 扫描
+        SEMGREP_REDACT_CODE=true semgrep scan --config auto . 2>&1 | tee semgrep_report.txt
+        
+    - name: "📤 上传扫描结果"
+      run: |
+        echo "上传扫描结果..."
+        curl -X POST "$AUDIT_SERVER/upload-and-audit/" \
+          -F "file=@semgrep_report.txt" \
+          -F "additional_param=$PROJECT_NAME" \
+          -o uploadResponse.json
+        UPLOAD_RESPONSE=$(cat uploadResponse.json)
+        echo "semgrep上传文件api返回内容: $UPLOAD_RESPONSE"  
+        
+    - name: "⏳ 轮询审计结果"
+      id: audit-result
+      run: |
+        echo "轮询审计结果..."
+        
+        for i in {1..100}; do
+          echo "第 $i 次轮询..."
+          
+          curl -X POST "$AUDIT_SERVER/audit-status/" \
+            -F "task_id=$PROJECT_NAME" \
+            -o auditResponse.json
+            
+          AUDIT_RESPONSE=$(cat auditResponse.json)
+          echo "审计结果状态: $AUDIT_RESPONSE"
+          
+          STATUS=$(jq -r '.status // "error"' auditResponse.json 2>/dev/null || echo "error")
+          
+          if [ "$STATUS" = "completed" ]; then
+            echo "✅ 审计通过"
+            exit 0
+          elif [ "$STATUS" = "failed" ]; then
+            echo "❌ 审计失败"
+            exit 1
+          fi
+          
+          sleep 60
+        done
+        echo "❌ 轮询超时"
+        exit 1
+        
+        
+    - name: "打印审计结果"            # 测试使用，非必要代码段
+      if: always()        
+      run: |
+        echo "当前作业 (Job: ${{ github.job }}) 的执行结果为: ${{ job.status }}"
+        
+
+  # 作业2: 构建，依赖安全审计作业  (在 B 机器执行)
+  quality:
+    name: Quality
+    runs-on: ubuntu-latest
+    needs: security-audit  # 依赖安全审计作业
+    if: needs.security-audit.result == 'success'  # 只有审计成功才执行
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: 验证代码分支        # 测试使用，非必要代码段
+        run: cat test.txt
+        
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Test
+        run: pnpm test
+
+      - name: Build
+        run: pnpm build
+
+  # 作业3: 构建，依赖安全审计作业  (在 C 机器执行)
+  acceptance:
+    name: Acceptance
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs:
+      - quality
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+        
+      - name: 验证代码分支   # 测试使用，非必要代码段
+        run: cat test.txt
+
+        
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('pnpm-lock.yaml') }}
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browser
+        run: pnpm --filter @anydocs/web exec playwright install --with-deps chromium
+
+      - name: Run Playwright P0 acceptance suite
+        run: pnpm --filter @anydocs/web test:e2e:p0
+
+      - name: Upload Playwright artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-artifacts
+          path: |
+            packages/web/playwright-report
+            packages/web/test-results
+          if-no-files-found: ignore
+
+  

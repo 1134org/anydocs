@@ -193,17 +193,4 @@ jobs:
             packages/web/test-results
           if-no-files-found: ignore
 
-      - name: "📊 生成构建报告"   # 测试使用，非必要代码段
-        if: always()
-        run: |
-          echo "## 构建报告" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**作业状态:** ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
-          echo "**仓库:** ${{ github.repository }}" >> $GITHUB_STEP_SUMMARY
-          echo "**分支:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
-          echo "**提交:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
-          echo "**安全审计:** ✅ 通过" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "构建时间: $(date)" >> $GITHUB_STEP_SUMMARY
-
   

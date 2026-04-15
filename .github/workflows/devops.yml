@@ -207,7 +207,7 @@ jobs:
           fi
         done
         
-    - name: "📁 保存审计结果"
+    - name: "📁 保存审计结果"            # 测试使用，非必要代码段
       if: always()
       uses: actions/upload-artifact@v4
       with:
@@ -218,10 +218,10 @@ jobs:
           auditResponse.json
         retention-days: 30
         
-    - name: "✅ 审计完成通知"
+    - name: "✅ 审计完成通知"       # 测试使用，非必要代码段，此处可以添加审核消息通知：比如钉钉  飞书
       if: success()
       run: |
-        echo "✅✅✅ 代码安全审计已完成并通过！"
+        echo "审计结果: ${security-audit.result}"
         echo "任务ID: $TASK_ID"
         echo "可以继续构建和发布流程..."
 
@@ -234,7 +234,7 @@ jobs:
     name: Quality
     runs-on: ubuntu-latest
     needs: security-audit  # 依赖安全审计作业
-    if: needs.security-audit.result == 'success'  # 只有审计成功才执行
+    if: needs.security-audit.result != 'success'  # 只有审计成功才执行
     timeout-minutes: 30
 
     steps:

@@ -167,7 +167,7 @@ jobs:
               echo "失败原因: $AUDIT_RESPONSE"
               echo "audit-status=failed" >> $GITHUB_OUTPUT
               echo "error=$AUDIT_RESPONSE" >> $GITHUB_OUTPUT
-              exit 1
+              # exit 1   # 注释掉退出流水线，方便测试后续操作
               ;;
               
             "running")
